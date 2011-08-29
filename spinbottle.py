@@ -28,6 +28,8 @@ class Bottle:
         self.speedy = 0
         self.tork = 0
         self.speedt = 0
+        # Create a rect from the loaded image. --Kevin
+        self.rect = self.image.get_rect()
 
     def click(self,x,y):
         if x > self.x and x < self.x + self.width:
@@ -39,19 +41,42 @@ class Bottle:
                 self.speedy = 10
       
     def update(self):
-        if self.x < 0 or self.x + self.width > w:
+        # Here we're going to prevent the bottle from getting stuck on the edges of the screen. --Kevin
+        if self.x < 0:
             self.speedx = -self.speedx
+            self.x = 1
+        elif self.x + self.width > w:
+            self.speedx = -self.speedx
+            self.x = w - self.width - 1
 
-        if self.y < 0 or self.y + self.width > h:
+        if self.y < 0:
             self.speedy = -self.speedy
+            self.y = 1
+        elif self.y + self.width > h:
+            self.speedy = -self.speedy
+            self.y = h - self.width - 1
 
         self.x+=self.speedx
         self.y+=self.speedy
+        
+        # Set the rect's position to the object's x and y positon. --Kevin
+        self.rect.left, self.rect.top = self.x, self.y
 
         if self.speedx > 0:
-            self.speedx-=.05
+            self.speedx-=.025
+        elif self.speedx < 0:
+            self.speedx+=.025
+                
         if self.speedy > 0:
-            self.speedy-=.05
+            self.speedy-=.025
+        elif self.speedy < 0:
+            self.speedy+=.025
+            
+        # These lines stop the bottle from sliding by setting the speed to zero if the bottle's speed is almost zero. --Kevin
+        if (self.speedx > 0 and self.speedx < 0.5) or (self.speedx < 0 and self.speedx > -0.5):
+            self.speedx = 0
+        if (self.speedy > 0 and self.speedy < 0.5) or (self.speedy < 0 and self.speedy > -0.5):
+            self.speedy = 0
 
         #print self.speedx, self.speedy
 
@@ -62,8 +87,16 @@ class Bottle:
            
         print self.tork 
         self.image2 = pygame.transform.rotate(self.image,self.tork)
+        
+        # Create a new rect from the rotated image. --Kevin
+        self.rect2 = self.image2.get_rect()
+        
+        # Set the center of the rotated image's rect to be in the same position as the center of the un-rotated image's rect. 
+        # This fixes the strange rotation. --Kevin
+        self.rect2.center = self.rect.center
 
-        screen.blit(self.image2,(self.x,self.y))
+        # Now draw the image, using the rotated image's rect as the position. --Kevin
+        screen.blit(self.image2, self.rect2)
                 
 
 clock = pygame.time.Clock()
