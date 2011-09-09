@@ -10,6 +10,8 @@
 import pygame, sys, random
 from pygame import *
 
+pygame.mixer.init()
+
 w = 800
 h = 400
 
@@ -97,10 +99,37 @@ class Bottle:
 
         # Now draw the image, using the rotated image's rect as the position. --Kevin
         screen.blit(self.image2, self.rect2)
+        
+class Music:
+    def __init__(self, music):
+        self.unmute = pygame.image.load("unmute.png")
+        self.mute = pygame.image.load("mute.png")
+        self.image = self.unmute
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+        self.playing = True
+        self.music = pygame.mixer.Sound(music)
+        self.music.play(loops=-1)
+        self.x = 0
+        self.y = h - self.height
+        
+    def click(self, x, y):
+        if x > self.x and x < self.x + self.width:
+            if y > self.y and y < self.y + self.height:
+                if self.playing:
+                    self.image = self.mute
+                    self.playing = False
+                    #self.music.pause()
+                    pygame.mixer.pause()
+                else:
+                    self.image = self.unmute
+                    self.playing = True
+                    pygame.mixer.unpause()
                 
 
 clock = pygame.time.Clock()
 bottle = Bottle()
+music = Music("music.ogg")
 
 while 1:
     x,y = pygame.mouse.get_pos()
@@ -108,11 +137,14 @@ while 1:
     screen.fill((250,250,250))
     clock.tick(60)
     bottle.update()
+    screen.blit(music.image, (music.x, music.y))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == MOUSEBUTTONDOWN:
-            bottle.click(x,y)
+            bottle.click(x, y)
+            music.click(x, y)
 
     pygame.display.update()    
+
