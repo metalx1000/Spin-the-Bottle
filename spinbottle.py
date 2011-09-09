@@ -17,6 +17,10 @@ h = 400
 
 screen = pygame.display.set_mode((w,h))
 
+#Load Background Image
+bg = pygame.image.load("bg.png")
+bg = pygame.transform.scale(bg,(w,h))
+
 class Bottle:
     def __init__(self):
         self.width = 200
@@ -32,11 +36,15 @@ class Bottle:
         self.speedt = 0
         # Create a rect from the loaded image. --Kevin
         self.rect = self.image.get_rect()
+        #Load Glass Sound
+        self.sound1 = pygame.mixer.Sound("glass.wav") 
 
     def click(self,x,y):
         if x > self.x and x < self.x + self.width:
             if y > self.y and y < self.y + self.height:
  #               self.active = random.randint(0, 360)
+                #play sound when clicked
+                self.sound1.play()
                 self.tork = 6000
                 self.speedt = random.randint(25, 75)
                 self.speedx = 10
@@ -134,7 +142,7 @@ music = Music("music.ogg")
 while 1:
     x,y = pygame.mouse.get_pos()
 
-    screen.fill((250,250,250))
+    screen.blit(bg,(0,0))
     clock.tick(60)
     bottle.update()
     screen.blit(music.image, (music.x, music.y))
